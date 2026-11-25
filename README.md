@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="icons/icon.png" width="96" height="96" alt="Lumo app icon" />
-</p>
-
 # Lumo
 
 Basically two closed-source slow apps i used to pay for are now one free open-source ultrafast ultralightweight (17,6MB of disk space and only 10MB OF RAM HOLY MOLY) maintained candy for your enjoyment. 
