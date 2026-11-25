@@ -1,0 +1,60 @@
+[package]
+name = "lumo"
+version = "0.1.9"
+edition = "2021"
+description = "Lumo (placeholder) — turn your phone into a touchpad, clipboard and file bridge for your PC."
+authors = ["Lumo placeholder"]
+build = "build.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "net", "sync", "time", "fs", "io-util", "macros"] }
+axum = { version = "0.8", features = ["ws", "macros"] }
+futures-util = "0.3"
+tokio-util = { version = "0.7", features = ["io"] }
+rust-embed = "8"
+mime_guess = "2"
+arboard = { version = "3", features = ["image-data"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+walkdir = "2"
+uuid = { version = "1", features = ["v4"] }
+local-ip-address = "0.6"
+windows = { version = "0.58", features = [
+  "Foundation",
+  "Foundation_Collections",
+  "Media_Control",
+  "Storage_Streams",
+  "Win32_Foundation",
+  "Win32_Security",
+  "Win32_System_DataExchange",
+  "Win32_System_Power",
+  "Win32_System_Shutdown",
+  "Win32_System_SystemServices",
+  "Win32_System_Threading",
+  "Win32_System_WinRT",
+  "Win32_UI_Input_KeyboardAndMouse",
+] }
+winreg = "0.52"
+base64 = "0.22"
+percent-encoding = "2"
+rand = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+anyhow = "1"
+dirs = "6"
+open = "5"
+httpdate = "1"
+rfd = "0.15"
+qrcode = { version = "0.14", features = ["svg"] }
+
+[profile.release]
+opt-level = 2
+strip = true
+panic = "abort"

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Lumo",
+  "version": "0.1.9",
+  "identifier": "app.lumo.bridge",
+  "build": {
+    "frontendDist": "ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "shortDescription": "Phone as touchpad, clipboard and file bridge",
+    "longDescription": "Lumo (placeholder) runs a private server on your local network so your phone can control the pointer, share the clipboard and move files in both directions."
+  }
+}

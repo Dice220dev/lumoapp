@@ -1,0 +1,17 @@
+target/
+dist/
+.test-data/
+.test-inbox/
+.test-fixtures/
+.verify/
+.gui-test/
+.uitest/
+.uitest*/
+.media-test/
+.key-test/
+.light-test/
+.test-final/
+*.zip
+*.log
+stderr.txt
+stdout.txt

@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lumo</title>
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/png" href="/icons/favicon.png" />
+    <link rel="stylesheet" href="/tokens.css" />
+    <link rel="stylesheet" href="/desktop.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("lumo.theme") || "dark";
+          var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.setAttribute(
+            "data-theme",
+            saved === "system" ? (dark ? "dark" : "light") : saved
+          );
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="shell" id="shell" hidden>
+      <aside class="sidebar">
+        <div class="side-brand">
+          <span class="brand-mark" aria-hidden="true">
+            <img src="/icons/icon-192.png" alt="" width="36" height="36" />
+          </span>
+          <div class="side-brand-text">
+            <span class="brand-name">Lumo</span>
+            <span class="brand-sub">Phone ↔ PC bridge</span>
+          </div>
+        </div>
+
+        <nav class="side-nav" aria-label="Sections">
+          <button class="nav-item" data-nav="overview" aria-current="page">
+            <span class="ico" data-icon="overview" data-size="18"></span>
+            <span>Overview</span>
+          </button>
+          <button class="nav-item" data-nav="files">
+            <span class="ico" data-icon="folder" data-size="18"></span>
+            <span>Files</span>
+            <span class="nav-count" id="navShareCount" hidden>0</span>
+          </button>
+          <button class="nav-item" data-nav="clipboard">
+            <span class="ico" data-icon="clipboard" data-size="18"></span>
+            <span>Clipboard</span>
+          </button>
+          <button class="nav-item" data-nav="settings">
+            <span class="ico" data-icon="settings" data-size="18"></span>
+            <span>Settings</span>
+          </button>
+        </nav>
+
+        <div class="side-foot">
+          <div class="side-status">
+            <span class="status-dot" id="sideDot" data-state="starting" aria-hidden="true"></span>
+            <div class="side-status-text">
+              <span id="sideStatus">Starting server…</span>
+              <span class="caption mono" id="sideAddress">—</span>
+            </div>
+          </div>
+          <div class="side-actions">
+            <button class="btn ghost small" id="sideTheme" aria-label="Change theme">
+              <span class="ico" data-icon="moon" data-size="16"></span>
+              <span id="sideThemeLabel">Dark theme</span>
+            </button>
+          </div>
+          <div class="side-version caption">Lumo <span id="sideVersion">0.1.9</span> · placeholder</div>
+        </div>
+      </aside>
+
+      <div class="main">
+        <header class="main-head">
+          <div class="head-text">
+            <h1 id="pageTitle">Overview</h1>
+            <p id="pageSub" class="muted">“The design is very human.”©</p>
+          </div>
+          <div class="head-actions">
+            <span class="badge" id="serverBadge"><span class="dot"></span><span id="serverBadgeText">Starting…</span></span>
+            <button class="btn primary" id="btnShareFiles">
+              <span class="ico" data-icon="plus" data-size="16"></span>
+              Share files
+            </button>
+            <button class="icon-btn" id="btnOpenInbox" aria-label="Open received files folder" title="Open received files folder">
+              <span class="ico" data-icon="inbox" data-size="19"></span>
+            </button>
+          </div>
+        </header>
+
+        <div class="content" id="content">
+          <!-- Overview ------------------------------------------------->
+          <section class="page" data-page="overview">
+            <div class="hero-grid">
+              <article class="card pad-lg pair-card">
+                <div class="eyebrow">Pair a phone</div>
+                <div class="pair-head">
+                  <h2>Scan to connect</h2>
+                  <span class="badge accent" id="pairBadge">LAN only</span>
+                </div>
+                <div class="pair-body">
+                  <div class="qr-frame" id="qrFrame">
+                    <div class="qr-skeleton" id="qrSkeleton"></div>
+                  </div>
+                  <div class="pair-copy">
+                    <p class="muted" id="pairLead">
+                      Open the camera on your phone, scan this code, then add Lumo to your Home
+                      Screen.
+                    </p>
+                    <div class="url-row">
+                      <code class="mono" id="pairUrl">—</code>
+                      <button class="icon-btn small" id="copyPairUrl" aria-label="Copy pairing link" title="Copy pairing link">
+                        <span class="ico" data-icon="copy" data-size="16"></span>
+                      </button>
+                    </div>
+                    <ol class="steps">
+                      <li><span>1</span>Scan the code or open the link on your phone.</li>
+                      <li>
+                        <span>2</span>
+                        <div class="step-copy">
+                          <strong>Safari:</strong> Tap <strong>Share → Add to Home Screen</strong>.<br />
+                          <strong>Chrome:</strong> Tap <strong>⋮ → Add to Home Screen</strong>.
+                        </div>
+                      </li>
+                      <li><span>3</span>Launch Lumo and start using it as a touchpad.</li>
+                    </ol>
+                    <div class="row wrap">
+                      <button class="btn small" id="copyBaseUrl">
+                        <span class="ico" data-icon="link" data-size="16"></span>
+                        Copy address
+                      </button>
+                      <button class="btn ghost small" id="regenToken">
+                        <span class="ico" data-icon="refresh" data-size="16"></span>
+                        New link
+                      </button>
+                    </div>
+                    <p class="help">
+                      Phone can't reach this PC? Allow Lumo for private networks in Windows
+                      Firewall, and make sure both devices are on the same Wi-Fi.
+                    </p>
+                  </div>
+                </div>
+              </article>
+
+              <div class="side-stack">
+                <article class="card">
+                  <div class="card-header">
+                    <h3>Server</h3>
+                    <span class="badge success" id="serverPill"><span class="dot"></span>Running</span>
+                  </div>
+                  <dl class="stat-list">
+                    <div><dt>Address</dt><dd class="mono" id="statAddress">—</dd></div>
+                    <div><dt>Port</dt><dd class="mono" id="statPort">—</dd></div>
+                    <div><dt>Phones connected</dt><dd id="statPhones">0</dd></div>
+                    <div><dt>Uptime</dt><dd id="statUptime">—</dd></div>
+                  </dl>
+                  <div class="devices" id="deviceList"></div>
+                </article>
+
+                <button class="quick-drop" id="overviewDrop" type="button">
+                  <span class="quick-drop-icon ico" data-icon="upload" data-size="30"></span>
+                  <span class="quick-drop-title">Drop files to share</span>
+                  <span class="quick-drop-sub">or click to browse</span>
+                </button>
+              </div>
+
+              <article class="card activity-card">
+                <div class="card-header">
+                  <h3>Recent activity</h3>
+                  <button class="btn ghost small" id="clearActivity">Clear</button>
+                </div>
+                <div id="activityList" class="activity-list"></div>
+                <div class="empty compact" id="activityEmpty">
+                  <span class="empty-icon ico" data-icon="activity" data-size="22"></span>
+                  <p>Connect your phone or share a file — activity shows up here.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- Files ---------------------------------------------------->
+          <section class="page" data-page="files" hidden>
+            <div class="files-grid">
+              <article class="card pad-lg">
+                <div class="card-header">
+                  <div>
+                    <h3>Shared with your phone</h3>
+                    <p class="caption">Phone sees these under Files → From PC.</p>
+                  </div>
+                  <div class="row">
+                    <button class="btn small" id="addFolder">
+                      <span class="ico" data-icon="folder-plus" data-size="16"></span>
+                      Folder
+                    </button>
+                    <button class="btn primary small" id="addFiles">
+                      <span class="ico" data-icon="plus" data-size="16"></span>
+                      Files
+                    </button>
+                  </div>
+                </div>
+                <button class="file-drop" id="dropHint" type="button">
+                  <span class="file-drop-icon ico" data-icon="upload" data-size="30"></span>
+                  <span class="file-drop-title">Drop files or folders</span>
+                  <span class="file-drop-sub">or click to browse</span>
+                </button>
+                <div id="shareList" class="item-list big"></div>
+                <div class="empty" id="shareEmpty">
+                  <span class="empty-icon ico" data-icon="folder" data-size="24"></span>
+                  <h3>Nothing shared yet</h3>
+                  <p>Add a file, a folder, or drag them in. Downloads are generated on demand.</p>
+                </div>
+              </article>
+
+              <article class="card pad-lg">
+                <div class="card-header">
+                  <div>
+                    <h3>Received from your phone</h3>
+                    <p class="caption" id="inboxPath">Inbox folder</p>
+                  </div>
+                  <button class="btn ghost small" id="clearReceived">Clear list</button>
+                </div>
+                <div id="receivedList" class="item-list big"></div>
+                <div class="empty" id="receivedEmpty">
+                  <span class="empty-icon ico" data-icon="inbox" data-size="24"></span>
+                  <h3>The inbox is quiet</h3>
+                  <p>Send something from your phone's Files tab and it appears here.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- Clipboard ------------------------------------------------>
+          <section class="page" data-page="clipboard" hidden>
+            <div class="clip-grid">
+              <article class="card pad-lg">
+                <div class="card-header">
+                  <div>
+                    <h3>Windows clipboard</h3>
+                    <p class="caption" id="clipUpdated">Reading clipboard…</p>
+                  </div>
+                  <span class="badge" id="clipKind">Empty</span>
+                </div>
+                <div class="clip-preview" id="clipPreview">
+                  <p class="muted">Copy something on your PC, then send it to your phone.</p>
+                </div>
+                <div class="row wrap">
+                  <button class="btn primary" id="sendClipboard">
+                    <span class="ico" data-icon="send" data-size="16"></span>
+                    Send to phone
+                  </button>
+                  <button class="btn" id="refreshClipboard">
+                    <span class="ico" data-icon="refresh" data-size="16"></span>
+                    Refresh
+                  </button>
+                  <button class="btn ghost" id="copyClipboard">
+                    <span class="ico" data-icon="copy" data-size="16"></span>
+                    Copy
+                  </button>
+                </div>
+              </article>
+
+              <article class="card pad-lg">
+                <div class="card-header">
+                  <h3>Send text to your phone</h3>
+                  <span class="badge" id="syncBadge">Auto-sync on</span>
+                </div>
+                <label class="switch setting">
+                  <span class="setting-text">
+                    <span class="label">Auto-sync to connected phones</span>
+                    <span class="caption">Pushes new clipboard contents over the live connection.</span>
+                  </span>
+                  <input type="checkbox" id="clipSyncToggle" checked />
+                  <span class="switch-track" aria-hidden="true"></span>
+                </label>
+                <hr class="divider" />
+                <label class="label" for="phoneText">Write a note, link or address</label>
+                <textarea class="input" id="phoneText" rows="5" placeholder="Type something to send to your phone…" spellcheck="false"></textarea>
+                <button class="btn primary" id="sendTextToPhone">
+                  <span class="ico" data-icon="send" data-size="16"></span>
+                  Send to phone
+                </button>
+                <p class="help">It lands in the phone's Recent clipboard, ready to copy.</p>
+              </article>
+            </div>
+
+            <article class="card pad-lg note-card">
+              <span class="ico" data-icon="shield" data-size="20"></span>
+              <div>
+                <h3>Clipboard data stays on your network</h3>
+                <p class="caption">
+                  Files, text and images are served directly from this PC over the local network —
+                  never through a cloud service. Turn auto-sync off when you copy sensitive items.
+                </p>
+              </div>
+            </article>
+          </section>
+
+          <!-- Settings ------------------------------------------------->
+          <section class="page" data-page="settings" hidden>
+            <div class="settings-stack">
+              <div class="banner" id="restartBanner" hidden>
+                <span class="ico" data-icon="alert" data-size="18"></span>
+                <div class="grow">
+                  <strong>Restart Lumo to use the new port</strong>
+                  <span class="caption">The server keeps the old port until the app restarts.</span>
+                </div>
+                <button class="btn small" id="relaunch">Restart app</button>
+              </div>
+
+              <article class="card pad-lg">
+                <div class="card-header"><h3>This PC</h3></div>
+                <div class="setting">
+                  <div class="setting-text">
+                    <label class="label" for="deviceName">Display name</label>
+                    <span class="caption">Shown on your phone.</span>
+                  </div>
+                  <input class="input slim" id="deviceName" maxlength="60" />
+                </div>
+                <div class="setting">
+                  <div class="setting-text">
+                    <label class="label" for="portInput">Server port</label>
+                    <span class="caption">Phones reach Lumo at this port. 1024–65535.</span>
+                  </div>
+                  <input class="input slim mono" id="portInput" type="number" min="1024" max="65535" />
+                </div>
+                <div class="setting">
+                  <div class="setting-text">
+                    <span class="label">Inbox folder</span>
+                    <span class="caption mono" id="inboxDir">—</span>
+                  </div>
+                  <div class="row">
+                    <button class="btn small" id="changeInbox">Change…</button>
+                    <button class="icon-btn small" id="openInbox" aria-label="Open inbox">
+                      <span class="ico" data-icon="external" data-size="16"></span>
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article class="card pad-lg">
+                <div class="card-header"><h3>Startup &amp; tray</h3></div>
+                <label class="switch setting">
+                  <span class="setting-text">
+                    <span class="label">Start Lumo when I sign in</span>
+                    <span class="caption">Windows may delay the launch up to a minute.</span>
+                  </span>
+                  <input type="checkbox" id="autostartToggle" />
+                  <span class="switch-track" aria-hidden="true"></span>
+                </label>
+                <label class="switch setting">
+                  <span class="setting-text">
+                    <span class="label">Start minimized in the tray</span>
+                    <span class="caption">When off, the Lumo window opens at sign-in.</span>
+                  </span>
+                  <input type="checkbox" id="startMinimizedToggle" />
+                  <span class="switch-track" aria-hidden="true"></span>
+                </label>
+                <label class="switch setting">
+                  <span class="setting-text">
+                    <span class="label">Clipboard auto-sync</span>
+                    <span class="caption">Push clipboard changes to paired phones.</span>
+                  </span>
+                  <input type="checkbox" id="clipboardSyncToggle" />
+                  <span class="switch-track" aria-hidden="true"></span>
+                </label>
+                <p class="caption foot-note">
+                  Closing this window keeps Lumo running in the tray. Use Quit Lumo from the tray
+                  menu to stop the server.
+                </p>
+              </article>
+
+              <article class="card pad-lg">
+                <div class="card-header"><h3>Appearance</h3></div>
+                <div class="setting">
+                  <div class="setting-text">
+                    <span class="label">Theme</span>
+                    <span class="caption">Applies to this window and your phone.</span>
+                  </div>
+                  <div class="segmented" role="tablist" aria-label="Theme">
+                    <button role="tab" data-theme-choice="system" aria-selected="true">System</button>
+                    <button role="tab" data-theme-choice="light" aria-selected="false">Light</button>
+                    <button role="tab" data-theme-choice="dark" aria-selected="false">Dark</button>
+                  </div>
+                </div>
+              </article>
+
+              <article class="card pad-lg">
+                <div class="card-header"><h3>Security</h3></div>
+                <div class="setting">
+                  <div class="setting-text">
+                    <span class="label">Pairing link</span>
+                    <span class="caption">Anyone with this link can control this PC while on your network.</span>
+                  </div>
+                  <div class="row">
+                    <button class="btn small" id="copyPair">Copy link</button>
+                    <button class="btn danger-ghost small" id="resetPair">Reset link</button>
+                  </div>
+                </div>
+                <div class="setting">
+                  <div class="setting-text">
+                    <span class="label">Connected phones</span>
+                    <span class="caption" id="securityDevices">No phones connected.</span>
+                  </div>
+                  <span class="badge" id="securityCount">0</span>
+                </div>
+              </article>
+
+              <article class="card pad-lg">
+                <div class="card-header"><h3>About</h3></div>
+                <div class="setting">
+                  <div class="setting-text">
+                    <span class="label">Lumo <span id="versionText">0.1.9</span></span>
+                    <span class="caption">Placeholder name, logo and product copy.</span>
+                  </div>
+                  <div class="row">
+                    <button class="btn ghost small" id="openLog">Open log</button>
+                    <button class="btn ghost small" id="quitApp">Quit Lumo</button>
+                  </div>
+                </div>
+                <div class="setting">
+                  <div class="setting-text">
+                    <span class="label">Data folder</span>
+                    <span class="caption mono" id="dataDir">—</span>
+                  </div>
+                  <button class="icon-btn small" id="openData" aria-label="Open data folder">
+                    <span class="ico" data-icon="external" data-size="16"></span>
+                  </button>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="fatal" id="fatal" hidden>
+      <div class="fatal-card">
+        <h1>Lumo can't reach its interface</h1>
+        <p class="muted">This window must be opened by the Lumo desktop app, not a browser.</p>
+        <button class="btn primary" id="reload">Try again</button>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="modalBackdrop" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody">
+        <h2 id="modalTitle">Are you sure?</h2>
+        <p id="modalBody"></p>
+        <div class="modal-actions">
+          <button class="btn ghost" id="modalCancel">Cancel</button>
+          <button class="btn danger" id="modalConfirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-stack" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+    <script src="/desktop.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Lumo</title>
+    <meta name="description" content="Lumo turns this phone into a touchpad, clipboard and file bridge for your PC." />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Lumo" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="/icons/favicon.png" />
+    <link rel="stylesheet" href="/tokens.css" />
+    <link rel="stylesheet" href="/mobile.css" />
+    <script>
+      // Resolve the theme before first paint to avoid a flash.
+      (function () {
+        try {
+          var saved = localStorage.getItem("lumo.theme") || "dark";
+          var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var resolved =
+            saved === "system" ? (dark ? "dark" : "light") : saved;
+          document.documentElement.setAttribute("data-theme", resolved);
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.content = resolved === "dark" ? "#000000" : "#FFFFFF";
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body data-view="pad">
+    <div class="app" id="app" hidden>
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <img src="/icons/icon-192.png" alt="" width="34" height="34" />
+          </span>
+          <div class="brand-text">
+            <span class="brand-name">Lumo</span>
+            <span class="brand-sub" id="pcName">Connecting…</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span class="status-pill" id="connPill" data-state="connecting">
+            <span class="dot" aria-hidden="true"></span>
+            <span id="connLabel">Connecting</span>
+          </span>
+          <button class="icon-btn" id="btnSettings" aria-label="Open settings" aria-haspopup="dialog">
+            <span class="ico" data-icon="settings"></span>
+          </button>
+        </div>
+      </header>
+
+      <main id="views">
+        <!-- Touchpad ------------------------------------------------------>
+        <section class="view view-pad" data-view="pad" aria-label="Touchpad">
+          <div class="pad-wrap">
+            <div class="pad-shell">
+              <div class="pad-surface">
+                <div
+                  class="pad"
+                  id="pad"
+                  role="application"
+                  aria-label="Touchpad. Drag one finger to move the pointer, tap to click, two-finger tap for right click, two fingers to scroll."
+                >
+                  <div class="pad-grid" aria-hidden="true"></div>
+                  <canvas class="pad-trail" id="padTrail" aria-hidden="true"></canvas>
+                  <div class="pad-hint" id="padHint">
+                    <span class="pad-hint-icon ico" data-icon="hand" aria-hidden="true"></span>
+                    <p><strong>Slide</strong> to move · <strong>Tap</strong> to click</p>
+                    <p class="caption">Two fingers scroll · Two-finger tap right-clicks</p>
+                  </div>
+                  <div class="pad-ripple" id="padRipple" aria-hidden="true"></div>
+                </div>
+
+                <div
+                  class="wheel"
+                  id="wheel"
+                  role="slider"
+                  aria-label="Scroll wheel. Drag to scroll, double-tap for middle click."
+                  aria-valuemin="-100"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  tabindex="0"
+                >
+                  <div class="wheel-ticks" aria-hidden="true"></div>
+                  <div class="wheel-thumb" aria-hidden="true"></div>
+                </div>
+
+                <div class="media-player" id="mediaPlayer" aria-hidden="true">
+                  <div class="media-art">
+                    <img id="mediaArt" alt="" hidden />
+                    <span class="media-art-fallback ico" data-icon="music" data-size="24" aria-hidden="true"></span>
+                  </div>
+                  <div class="media-body">
+                    <div class="media-head">
+                      <div class="media-meta">
+                        <strong id="mediaTitle">Now playing</strong>
+                        <span id="mediaArtist" class="media-artist"></span>
+                      </div>
+                      <span id="mediaApp" class="media-app"></span>
+                    </div>
+                    <div class="media-progress"><span id="mediaBar"></span></div>
+                    <div class="media-times">
+                      <span id="mediaPos">0:00</span>
+                      <span id="mediaDur">0:00</span>
+                    </div>
+                    <div class="media-controls">
+                      <button class="media-btn" type="button" data-media="seek-back" aria-label="Back 10 seconds">−10</button>
+                      <button class="media-btn" type="button" data-media="prev" aria-label="Previous track">
+                        <span class="ico" data-icon="prev" data-size="15"></span>
+                      </button>
+                      <button class="media-btn primary" type="button" id="mediaToggle" data-media="toggle" aria-label="Play or pause">
+                        <span class="ico" id="mediaToggleIcon" data-icon="play" data-size="17"></span>
+                      </button>
+                      <button class="media-btn" type="button" data-media="next" aria-label="Next track">
+                        <span class="ico" data-icon="next" data-size="15"></span>
+                      </button>
+                      <button class="media-btn" type="button" data-media="seek-forward" aria-label="Forward 10 seconds">+10</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pad-controls">
+                <button class="pad-btn pad-btn-lmb" data-mouse="left" aria-label="Left click"></button>
+
+                <div class="pad-center">
+                  <button class="pad-btn pad-btn-aux pad-btn-media" type="button" id="padMedia" aria-label="Media player" aria-pressed="false">
+                    <span class="ico" data-icon="music" data-size="16"></span>
+                  </button>
+                  <button class="pad-btn pad-btn-aux" type="button" id="padKeyboard" aria-label="Type on your PC">
+                    <span class="ico" data-icon="keyboard" data-size="16"></span>
+                  </button>
+                </div>
+
+                <button class="pad-btn pad-btn-rmb" data-mouse="right" aria-label="Right click"></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Files -------------------------------------------------------->
+        <section class="view view-files" data-view="files" aria-label="Files" hidden>
+          <div class="view-head">
+            <h1>Files</h1>
+            <p class="muted">Move anything between your phone and your PC.</p>
+          </div>
+
+          <div class="segmented files-seg" role="tablist" aria-label="File direction">
+            <button role="tab" id="tabFromPc" aria-selected="true" aria-controls="panelFromPc">
+              From PC
+            </button>
+            <button role="tab" id="tabToPc" aria-selected="false" aria-controls="panelToPc">
+              To PC
+            </button>
+          </div>
+
+          <div id="panelFromPc" role="tabpanel" aria-labelledby="tabFromPc">
+            <div class="section-head">
+              <h2>Shared by your PC</h2>
+              <button class="btn ghost small" id="refreshShares">
+                <span class="ico" data-icon="refresh" data-size="16"></span>
+                Refresh
+              </button>
+            </div>
+            <div id="shareList" class="item-list"></div>
+            <div class="empty" id="shareEmpty">
+              <span class="empty-icon ico" data-icon="folder" data-size="24"></span>
+              <h3>Nothing shared yet</h3>
+              <p>
+                On your PC, open Lumo → Files and add files or a folder. They show up here
+                instantly.
+              </p>
+            </div>
+          </div>
+
+          <div id="panelToPc" role="tabpanel" aria-labelledby="tabToPc" hidden>
+            <button class="dropzone" id="pickFiles" type="button">
+              <span class="dropzone-icon ico" data-icon="upload" data-size="24"></span>
+              <span class="dropzone-title">Choose files to send</span>
+              <span class="dropzone-sub">Photos, videos, documents, archives — any size.</span>
+            </button>
+            <input id="fileInput" type="file" multiple hidden />
+            <div id="uploadList" class="upload-list"></div>
+            <p class="hint">
+              Sending a folder? Compress it first in Files (long-press → Compress) and send the
+              .zip — Lumo unpacks it on your PC.
+            </p>
+            <div class="section-head">
+              <h2>Received by your PC</h2>
+              <button class="btn ghost small" id="refreshUploads">
+                <span class="ico" data-icon="refresh" data-size="16"></span>
+                Refresh
+              </button>
+            </div>
+            <div id="recentUploads" class="item-list"></div>
+          </div>
+        </section>
+
+        <!-- Clipboard ---------------------------------------------------->
+        <section class="view view-clipboard" data-view="clipboard" aria-label="Clipboard" hidden>
+          <div class="view-head">
+            <h1>Clipboard</h1>
+            <p class="muted">Copy on one device, paste on the other.</p>
+          </div>
+
+          <div class="card clip-card">
+            <div class="card-header">
+              <div class="row">
+                <span class="item-icon ico" data-icon="clipboard" data-size="18"></span>
+                <div>
+                  <h3>On your PC</h3>
+                  <span class="caption" id="clipUpdated">Not synced yet</span>
+                </div>
+              </div>
+              <span class="badge" id="clipKind">Empty</span>
+            </div>
+            <div class="clip-preview" id="clipPreview">
+              <p class="muted">Copy something on your PC and it appears here.</p>
+            </div>
+            <div class="row wrap clip-actions">
+              <button class="btn small" id="copyClip">
+                <span class="ico" data-icon="copy" data-size="16"></span>
+                Copy on phone
+              </button>
+              <button class="btn ghost small" id="refreshClip">
+                <span class="ico" data-icon="refresh" data-size="16"></span>
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="card pad-lg composer">
+            <label class="label" for="clipText">Send text to your PC</label>
+            <textarea
+              class="input"
+              id="clipText"
+              rows="3"
+              placeholder="Paste or type something…"
+              autocomplete="off"
+            ></textarea>
+            <div class="row wrap">
+              <button class="btn primary" id="sendClip">
+                <span class="ico" data-icon="send" data-size="16"></span>
+                Send to PC
+              </button>
+              <button class="btn" id="clipFiles">
+                <span class="ico" data-icon="file" data-size="16"></span>
+                Send files
+              </button>
+              <input id="clipFileInput" type="file" multiple hidden />
+            </div>
+            <p class="help">Files sent here land in the Windows clipboard, ready to paste.</p>
+          </div>
+
+          <div class="section-head">
+            <h2>Recent clipboard</h2>
+            <button class="btn ghost small" id="clearClipHistory">Clear</button>
+          </div>
+          <div id="clipHistory" class="item-list"></div>
+          <div class="empty" id="clipHistoryEmpty">
+            <span class="empty-icon ico" data-icon="clipboard" data-size="24"></span>
+            <h3>No history yet</h3>
+            <p>Clipboard items shared while this page is open will collect here.</p>
+          </div>
+        </section>
+
+        <!-- Power -------------------------------------------------------->
+        <section class="view view-power" data-view="power" aria-label="Power" hidden>
+          <div class="view-head">
+            <h1>Power</h1>
+            <p class="muted">Control your PC without leaving the couch.</p>
+          </div>
+
+          <div class="power-grid">
+            <button class="power-card" data-power="lock">
+              <span class="power-icon ico" data-icon="lock" data-size="22"></span>
+              <span class="power-title">Lock</span>
+              <span class="power-sub">Keep everything running</span>
+            </button>
+            <button class="power-card" data-power="sleep">
+              <span class="power-icon ico" data-icon="moon" data-size="22"></span>
+              <span class="power-title">Sleep</span>
+              <span class="power-sub">Suspend until you return</span>
+            </button>
+            <button class="power-card warn" data-power="restart">
+              <span class="power-icon ico" data-icon="rotate" data-size="22"></span>
+              <span class="power-title">Restart</span>
+              <span class="power-sub">Reboot with an 8s grace</span>
+            </button>
+            <button class="power-card danger" data-power="shutdown">
+              <span class="power-icon ico" data-icon="power" data-size="22"></span>
+              <span class="power-title">Shut down</span>
+              <span class="power-sub">Power off with an 8s grace</span>
+            </button>
+          </div>
+
+          <div class="card pending-card" id="pendingCard" hidden>
+            <div class="row between">
+              <div>
+                <h3 id="pendingTitle">Shutting down</h3>
+                <p class="caption" id="pendingCountdown">in 8 seconds</p>
+              </div>
+              <button class="btn danger-ghost small" id="cancelPower">Cancel</button>
+            </div>
+            <div class="progress"><span id="pendingProgress"></span></div>
+          </div>
+
+          <div class="card info-card">
+            <span class="ico" data-icon="shield" data-size="20"></span>
+            <div>
+              <h3>Your PC stays in control</h3>
+              <p class="caption">
+                Restart and shut down wait 8 seconds so you can cancel. Actions only run while
+                this phone is paired with your PC.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <nav class="tabbar" aria-label="Primary">
+        <button class="tab" data-tab="pad" aria-current="page">
+          <span class="ico" data-icon="mouse" data-size="22"></span>
+          <span>Touchpad</span>
+        </button>
+        <button class="tab" data-tab="files">
+          <span class="ico" data-icon="folder" data-size="22"></span>
+          <span>Files</span>
+        </button>
+        <button class="tab" data-tab="clipboard">
+          <span class="ico" data-icon="clipboard" data-size="22"></span>
+          <span>Clipboard</span>
+        </button>
+        <button class="tab" data-tab="power">
+          <span class="ico" data-icon="power" data-size="22"></span>
+          <span>Power</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Pairing -------------------------------------------------------->
+    <div class="pairing" id="pairing" hidden>
+      <div class="pairing-card">
+        <span class="pairing-mark" aria-hidden="true">
+          <img src="/icons/icon-192.png" alt="" width="68" height="68" />
+        </span>
+        <h1>Pair this phone</h1>
+        <p class="muted">
+          Open <strong>Lumo</strong> on your PC and scan the QR code, or open the pairing link it
+          shows. Pairing links expire when you reset the link.
+        </p>
+        <button class="btn primary block" id="retryPair">I'm on the PC — retry</button>
+        <p class="caption">
+          Make sure this phone and your PC are on the same Wi-Fi network. If the page never
+          connects, allow Lumo through Windows Firewall on private networks.
+        </p>
+      </div>
+    </div>
+
+    <!-- Settings sheet ------------------------------------------------->
+    <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+    <aside class="sheet" id="settingsSheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <h2 id="settingsTitle">Settings</h2>
+        <button class="icon-btn" id="closeSheet" aria-label="Close settings">
+          <span class="ico" data-icon="x" data-size="18"></span>
+        </button>
+      </div>
+
+      <section class="setting-group">
+        <h3 class="eyebrow">Pointer</h3>
+        <div class="setting slider-setting">
+          <div class="setting-text">
+            <span class="label">Pointer speed</span>
+            <span class="caption" id="speedValue">1.2×</span>
+          </div>
+          <input class="range" id="pointerSpeed" type="range" min="0.4" max="2.6" step="0.1" value="1.2" aria-label="Pointer speed" />
+        </div>
+        <label class="switch setting">
+          <span class="setting-text">
+            <span class="label">Natural scrolling</span>
+            <span class="caption">Two fingers up scrolls down</span>
+          </span>
+          <input type="checkbox" id="naturalScroll" checked />
+          <span class="switch-track" aria-hidden="true"></span>
+        </label>
+        <label class="switch setting">
+          <span class="setting-text">
+            <span class="label">Momentum</span>
+            <span class="caption">Keep gliding after a flick</span>
+          </span>
+          <input type="checkbox" id="inertia" checked />
+          <span class="switch-track" aria-hidden="true"></span>
+        </label>
+      </section>
+
+      <section class="setting-group">
+        <h3 class="eyebrow">Type on your PC</h3>
+        <textarea class="input" id="typeText" rows="2" placeholder="Text appears at the PC cursor…"></textarea>
+        <button class="btn block" id="sendTypedText">
+          <span class="ico" data-icon="keyboard" data-size="16"></span>
+          Send keystrokes
+        </button>
+      </section>
+
+      <section class="setting-group">
+        <h3 class="eyebrow">Appearance</h3>
+        <div class="segmented theme-seg" role="tablist" aria-label="Theme">
+          <button role="tab" data-theme-choice="system" aria-selected="true">System</button>
+          <button role="tab" data-theme-choice="light" aria-selected="false">Light</button>
+          <button role="tab" data-theme-choice="dark" aria-selected="false">Dark</button>
+        </div>
+      </section>
+
+      <section class="setting-group">
+        <h3 class="eyebrow">Connection</h3>
+        <div class="setting">
+          <span class="setting-text">
+            <span class="label" id="connDevice">Your PC</span>
+            <span class="caption mono" id="connAddress">—</span>
+          </span>
+          <span class="badge" id="connBadge">Offline</span>
+        </div>
+        <div class="setting">
+          <span class="setting-text">
+            <span class="label">This phone</span>
+            <span class="caption" id="thisPhone">—</span>
+          </span>
+        </div>
+        <button class="btn danger-ghost block" id="unpair">
+          <span class="ico" data-icon="link-off" data-size="16"></span>
+          Unpair this phone
+        </button>
+      </section>
+
+      <p class="caption about">
+        Lumo <span id="appVersion">0.1.9</span> · Placeholder name &amp; logo ·
+        Add to Home Screen from your browser menu for a full-screen app.
+      </p>
+    </aside>
+
+    <!-- Confirm modal -------------------------------------------------->
+    <div class="modal-backdrop" id="modalBackdrop" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody">
+        <h2 id="modalTitle">Are you sure?</h2>
+        <p id="modalBody"></p>
+        <div class="modal-actions">
+          <button class="btn ghost" id="modalCancel">Cancel</button>
+          <button class="btn danger" id="modalConfirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick keyboard: full-screen live typing layer ----------------->
+    <div class="keyboard-overlay" id="keyboardOverlay" hidden>
+      <div class="keyboard-panel">
+        <div class="keyboard-head">
+          <span class="keyboard-label">Typing to your PC</span>
+        </div>
+        <textarea
+          class="type-input"
+          id="quickType"
+          rows="1"
+          autocomplete="off"
+          autocapitalize="sentences"
+          spellcheck="false"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="toast-stack" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+    <script src="/mobile.js" defer></script>
+  </body>
+</html>
