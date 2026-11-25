@@ -1,10 +1,10 @@
 # Lumo
 
-Basically two closed-source slow apps i used to pay for are now one free open-source ultrafast ultralightweight (17,6MB of disk space and consumes only 10MB of RAM HOLY MOLY) maintained candy for your enjoyment. 
+Basically two closed-source slow apps i used to pay for are now one free open-source ultrafast ultralightweight (17,6MB of disk space and only 10MB OF RAM HOLY MOLY) maintained candy for your enjoyment. 
 
 Lumo is a small Rust + Tauri tray app that serves a private web app on your local network built by my slave army of AI agents and presumably me in two hours cuz i got fed up with the bullshit i was using.
 Pair a phone with a QR code, add it to the Home Screen, and control the PC without any
-cloud account or internet connection. You get a cool touchpad, near instant file transfer between devices and media controls.
+cloud account or internet connection. You get a cool touchpad, near instant file transfer between devices and media controls. And you don't even need a separate app on your phone for this, what more can you ask for?
 
 | Phone | Desktop |
 | --- | --- |
