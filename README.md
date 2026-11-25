@@ -6,9 +6,23 @@ Lumo is a small Rust + Tauri tray app that serves a private web app on your loca
 Pair a phone with a QR code, add it to the Home Screen, and control the PC without any
 cloud account or internet connection. You get a cool touchpad, near instant file transfer between devices and media controls. And you don't even need a separate app on your phone for this, what more can you ask for?
 
-| Phone | Desktop |
-| --- | --- |
-| ![Touchpad on a phone](docs/shots/mobile-pad-dark.png) | ![Lumo desktop overview](docs/shots/desktop-overview-dark.png) |
+## Screenshots
+
+### Phone
+
+| Touchpad | Files |
+| :---: | :---: |
+| ![Touchpad](docs/shots/mobile-pad-dark.png) | ![Files](docs/shots/mobile-files.png) |
+| **Clipboard** | **Power** |
+| ![Clipboard](docs/shots/mobile-clipboard.png) | ![Power](docs/shots/mobile-power.png) |
+
+### Desktop
+
+| Overview | Files |
+| :---: | :---: |
+| ![Overview](docs/shots/desktop-overview-dark.png) | ![Files](docs/shots/desktop-files.png) |
+| **Clipboard** | **Settings** |
+| ![Clipboard](docs/shots/desktop-clipboard.png) | ![Settings](docs/shots/desktop-settings.png) |
 
 ## Features
 
