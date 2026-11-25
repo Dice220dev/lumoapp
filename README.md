@@ -1,8 +1,8 @@
 # Lumo
 
-Turn your phone into a **wireless touchpad, clipboard bridge and file drop** for Windows.
+Basically two closed-source slow apps i used to pay for are now one free open-source ultrafast ultralightweight (17,6MB of disk space and consumes only 10MB of RAM HOLY MOLY) maintained candy for your enjoyment. 
 
-Lumo is a small Rust + Tauri tray app that serves a private web app on your local network.
+Lumo is a small Rust + Tauri tray app that serves a private web app on your local network built by my slave army of AI agents and presumably me in two hours cuz i got fed up with the bullshit i was using.
 Pair a phone with a QR code, add it to the Home Screen, and control the PC without any
 cloud account or internet connection.
 
