@@ -86,6 +86,6 @@ turn it off when needed.
 ## Project notes
 
 - Version: **0.1.9** — name, logo and copy are placeholders.
-- Design: **Blizzard Blue on black**; dark theme by default.
+- Design: dark theme by default, light theme is present.
 - Detailed development, architecture and API notes: [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 - License: TBD.
