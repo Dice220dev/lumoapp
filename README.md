@@ -8,7 +8,7 @@ cloud account or internet connection. You get a cool touchpad, near instant file
 
 | Phone | Desktop |
 | --- | --- |
-| ![Touchpad on a phone](docs/shots/mobile-pad-dark.png) | ![Lumo desktop overview](docs/shots/desktop-overview-dark.png) |
+| ![Touchpad on a phone](docs/shots/mobile-pad-dark.png) | ![Lumo desktop overview](docs/shots/desktop-overview-dark.png) (docs/shots/desktop-clipboard.png)  |
 
 ## Features
 
